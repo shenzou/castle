@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Hotel/Restaurant searcher</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="static/style.css" type="text/css">
+</head>
+
+<body>
+  <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="#Home">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Features">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Pricing</a>
+        </li>
+      </ul>
+    </div>
+    <a class="navbar-brand" href="#">Hotel/Restaurant searcher</a>
+  </nav>
+
+
+  <section id="home">
+
+    <div class="pageContent jumbotron p-3 mb-2 bg-secondary text-white">
+      <div class="font-weight-bold text-center">
+        <label>Please enter informations to find your best hotel.</label>
+      </div>
+      <p></p>
+      <form>
+        <div class="container">
+          <div id="bar" class="form-group row">
+            <div class="col-sm">
+              <label for="inputDept">Choose your region</label>
+              <select class="form-control crs-country" data-whitelist="FR" data-region-id="inputDept"></select>
+              <select class="form-control" id="inputDept"></select>
+            </div>
+            <div class="col-sm">
+              <label for="inputHotel">Do you want an hotel or a restaurant?</label>
+              <select class="form-control" id="inputHotel">
+                <option>Both</option>
+                <option>Hotel</option>
+                <option>Restaurant</option>
+              </select>
+            </div>
+            <div class="col-sm">
+              <label for="rangePrice">Maximum price</label>
+              <input type="range" class="form-control-range" id="rangePrice" name="rangePrice" min="0" max="500"
+                value="250" oninput="amount.value=rangePrice.value">
+              <output id="amount" name="amount" for="rangePrice">250</output>
+              <label>€</label>
+            </div>
+            <div class="col-sm">
+              <label for="rangeStars">Michelin Stars</label>
+              <input type="range" class="form-control-range" id="rangeStars" name="rangeStars" min="0" max="3" value="0"
+                oninput="amount2.value=rangeStars.value">
+              <output id="amount2" name="amount2" for="rangeStars">0</output>
+            </div>
+          </div>
+        </div>
+
+      </form>
+      <p class="text-center">
+        <button id="comp" class="btn btn-primary">Search</button>
+      </p>
+    </div>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"> </script>
+
+    <script>
+      updateL = null;
+      $(function () {
+
+        function updateList() {
+          var hostels = [];
+          var starsValue = document.getElementById('rangeStars').value;
+
+          $("#tListHostel").empty();
+
+          $.getJSON('/static/externalFiles/hostels.json', function (data) {
+            var i = 0;
+            var tblRow;
+            for (i; i < data.hostelsRest.length; i++) {
+              if (data.hostelsRest[i].michelinStars == starsValue) {
+                var tblRow = "<tr>" + "<td>" + data.hostelsRest[i].name + "</td>" +
+                  "<td>" + data.hostelsRest[i].location + "</td>" + "<td>" + data.hostelsRest[i].citation + "</td>" + "<td>" +
+                  "<img src=\"" + data.hostelsRest[i].image + "\" alt=\"Cannot display\" width=\"auto\" height=\"10%\"> </td>" + "<td>" + data.hostelsRest[i].michelinStars +
+                  "</td>" + "<td>" + "<a target=\"_blank\" class=\"btn btn-primary\" href=\"" + data.hostelsRest[i].michelinUri + "\" role=\"button\">Display</a> </td>" + "<td>" +
+                  "<a target=\"_blank\" class=\"btn btn-primary\" href=\"" + data.hostelsRest[i].uri + "\" role=\"button\">Reserve</a>" + "</td>" + "</tr>"
+                $(tblRow).appendTo("#listHostels tbody");
+                var resultsInfo = " Filters: " + starsValue + " Michelin stars";
+                document.getElementById("resultsInfo").innerText = resultsInfo;
+              }
+            }
+            /*
+            $.each(data.hostelsRest, function (i, f) {
+              var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
+                "<td>" + f.location + "</td>" + "<td>" + f.description + "</td>" + "<td>" + f.michelinStars + "</td>" + "</tr>"
+              $(tblRow).appendTo("#listHostels tbody");
+            });
+            */
+          });
+        }
+        updateL = updateList;
+      });
+
+      const button = document.querySelector('#comp');
+
+      button.addEventListener('click', function onClick() {
+
+
+        document.getElementById("result").style.visibility = "visible";
+        document.getElementById("result").style.display = "block";
+        updateL();
+
+        return;
+      });
+
+
+
+    </script>
+
+    <div class="card text-white bg-secondary results" id="result">
+      <div class="card-header wrapper">
+        <button id="mask" class="btn btn-primary">Go back</button>
+        <div id="resultsInfo"></div>
+      </div>
+      <div class="card-body profile">
+        <table id="listHostels" border="2">
+          <thead>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Citation</th>
+            <th>Photo</th>
+            <th>Michelin Stars</th>
+            <th>Michelin Review</th>
+            <th>Reserve</th>
+          </thead>
+          <tbody id="tListHostel">
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const backButton = document.querySelector('#mask');
+
+      backButton.addEventListener('click', function onClick() {
+
+        document.getElementById("result").style.display = "none";
+        document.getElementById("result").style.visibility = "hidden";
+
+
+        return;
+      });
+    </script>
+  </section>
+
+  <section id="Features">
+
+    
+
+  </section>
+
+
+
+
+
+  <script src="static/crs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+    integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+    integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

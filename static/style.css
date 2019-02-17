@@ -1,0 +1,34 @@
+body{
+  background-color:white;
+  background-image:url(images/bar.jpg);
+}
+
+div{
+  margin: 0px 0px;
+}
+
+.pageContent{
+  position: absolute;
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.title1{
+  position: absolute;
+  top: 25%; left:42%;
+}
+
+delimitation{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.results{
+  display:none;
+}
+
+.actor{
+  display:grid;
+  grid-template-columns: 33% 33% 33%;
+}
